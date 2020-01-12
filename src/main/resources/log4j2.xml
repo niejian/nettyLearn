@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- monitorInterval，配置为120，单位为秒。即在服务运行过程中发生了log4j2配置文件的修改，log4j2能够在monitorInterval时间范围重新加载配置，无需重启应用。-->
+<Configuration status="WARN" monitorInterval="120">
+
+
+    <properties>
+        <!--当输出到文件中的时候使用LOG_HOME替代输出到的文件夹,类似于配置java环境的时候的JAVA_HOME的做法-->
+        <!--最好是填写相对路径,基路径是当前项目也就是src的上一级别-->
+        <!--如果写成testlog/mylog,即使没有testlog,也会在src同级目录下新建出testlog文件夹以及其下的mylog文件夹-->
+        <property name="LOG_HOME">netty/nettyLog</property>
+        <property name="LOG_NAME">netty</property>
+    </properties>
+
+    <!--翻译：附加器,记录方式-->
+    <Appenders>
+
+        <!--appenders里的两个属性,分别为name=Console和name=log(两个名字是自己起的)-->
+        <!--appenders属性同级的loggers中的root的level的值控制输出信息的严格级别,一般是info-->
+        <!--root中的AppenderRef的ref写appenders中的name,在这里也就是添Console或log-->
+
+        <!--name是自己命名的,target=SYSTEM_OUT表示输出到控制台-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--pattern控制格式化输出的格式-->
+            <!--例子:在代码中写入logger.info("info级别信息");-->
+            <!--输出:12:8:34.501 [main] INFO  com.selton.Log4jTest - info级别信息-->
+            <PatternLayout pattern="%d{H:m:s.S} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+
+        <!--临时日志生成-->
+        <!--<File name="log" fileName="log/test.log" append="true">
+            <PatternLayout pattern="%d{H:m:s.S} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>-->
+
+        <!--fileName：日志存储路径,
+        filePattern：历史日志封存路径。其中%d{yyyyMMddHH}表示了封存历史日志的时间单位（目前单位为小时，yyyy表示年，MM表示月，dd表示天，HH表示小时，mm表示分钟，ss表示秒，SS表示毫秒）。
+        注意后缀，log4j2自动识别zip等后缀，表示历史日志需要压缩。-->
+        <RollingRandomAccessFile name="File" immediateFlush="true" fileName="${LOG_HOME}/${LOG_NAME}.log"
+                                 filePattern="${LOG_HOME}/history-%d{yyyy-MM-dd}.log">
+
+            <!-- level，表示最低接受的日志级别，配置为INFO，即我们期望打印INFO级别以上的日志。-->
+            <!--onMatch，表示当日志事件的日志级别与level一致时，应怎么做。一般为ACCEPT，表示接受。-->
+            <!--onMismatch，表示日志事件的日志级别与level不一致时，应怎么做。一般为DENY，表示拒绝。也可以为NEUTRAL表示中立。-->
+            <Filters>
+
+                <!--最下方的Root level="debug",如果不设置这句的话,4个级别信息都会打印,设置后,就会只打印INFO以及之上-->
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+
+            <!--输出到文件夹中去-->
+            <PatternLayout pattern="%d{y-M-d H:m:s.S} [%t] %-5level %logger{36} - %msg%n" />
+            <!--<HTMLLayout pattern="%d{y-M-d H:m:s.S} [%t] %-5level %logger{36} - %msg%n" />-->
+
+            <!--必配项,TriggeringPolicy(触发策略) -->
+            <Policies>
+                <!--按天,划分日志文件-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+
+            <!--必配项,RolloverStrategy(覆盖策略)-->
+            <!--<DefaultRolloverStrategy max="20"/>-->
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
