@@ -3,4 +3,4 @@ target
 nettyLearn.iml
 .idea
 log
-netty
+*.log
