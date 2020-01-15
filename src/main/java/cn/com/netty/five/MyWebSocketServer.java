@@ -1,5 +1,6 @@
-package cn.com.netty.four;
+package cn.com.netty.five;
 
+import cn.com.netty.four.MyServerInitializor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -9,14 +10,14 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * 心跳检测
+ * webscoker
+ *
  * @author niejian
  * @description
- * @file cn.com.netty.four.MyServer
- * @create 2020-01-14 22:12
+ * @file cn.com.netty.five.MyServer
+ * @create 2020-01-15 19:55
  **/
-public class MyServer {
-
+public class MyWebSocketServer {
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -26,7 +27,7 @@ public class MyServer {
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new MyServerInitializor());
+                    .childHandler(new WebSocketChannelInitializer());
 
             ChannelFuture channelFuture = serverBootstrap.bind(8899).sync();
             channelFuture.channel().closeFuture().sync();

@@ -171,6 +171,108 @@ public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
     channelGroup.writeAndFlush(date + " [服务器] - " + channel.remoteAddress() + " 离开 \n");
 }
 ```
+## 心跳检查程序
+* server端还是老样子。
+* `initializer`的写法<br/>
+服务端超过5S未读取到信息或者超过7秒未写，或者超过10秒既没有读也没有写，那么就心跳检测失败。<br/>
+```java
+ @Override
+protected void initChannel(SocketChannel ch) throws Exception {
+    ChannelPipeline pipeline = ch.pipeline();
+    // 在一定的事件间隔之内，链接没有发生任何读写事件，会触发该事件
+    // server端的空闲检测； 读空闲： 5 server5秒内未读取到数据，则提示读超时
+    pipeline.addLast("IdleStateHandler", new IdleStateHandler(5, 7, 10, TimeUnit.SECONDS));
+    pipeline.addLast(new MyServerHandler());
+}
+```
+* `channelHandler`<br/>
+这里的channelHandler就不再是继承`SimpleChannelInBoundHandler`了，而是专门继承另一个；<br/>
+
+```java
+public class MyServerHandler extends ChannelInboundHandlerAdapter {
+    /**
+     * 触发事件
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        // 如果是空闲事件
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            String eventType = null;
+            switch (event.state()) {
+                case READER_IDLE:
+                    eventType = "读空闲";
+                    break;
+                case WRITER_IDLE:
+                    eventType = "写空闲";
+                    break;
+                case ALL_IDLE:
+                    eventType = "读写空闲";
+                    break;
+            }
+
+            System.out.println(ctx.channel().remoteAddress() + " 超时事件： " + eventType);
+            ctx.channel().close();
+        }
+    }
+}
+
+```
+## 利用netty实现一个WebSocket服务器
+* server还是老样子
+* `initializerHandler`<br/>
+```java
+public class WebSocketChannelInitializer extends ChannelInitializer<SocketChannel> {
+    @Override
+    protected void initChannel(SocketChannel ch) throws Exception {
+        ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new HttpServerCodec());
+        pipeline.addLast(new ChunkedWriteHandler());
+        // 声明websocket的协议信息
+        // netty处理请求是按分段的方式来进行的，这里指定每段的长度
+        pipeline.addLast(new HttpObjectAggregator(8192));
+        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+        // 添加超时检查机制
+        pipeline.addLast("IdleStateHandler", new IdleStateHandler(5, 7, 10, TimeUnit.SECONDS));
+        pipeline.addLast(new MyIdleChannelHandler());
+        pipeline.addLast(new TextWebSocketServerHandler());
+
+    }
+}
+```
+* `ChannelHandler`<br/>
+我这里有两个handler，分别是上一节讲述的心跳检测的handler和处理文本信息的websocket
+    * TextWebSocketServerHandler （文本信息的websocket处理）
+    ```java
+    public class TextWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
+            System.out.println("客户端消息内容： " + msg.text());
+            ctx.writeAndFlush(new TextWebSocketFrame("服务器时间" + LocalDateTime.now()));
+        }
+    
+        @Override
+        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+            System.out.println("handlerAdded：" + ctx.channel().id().asLongText());
+    
+        }
+    
+        @Override
+        public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+            System.out.println("handlerRemoved: " + ctx.channel().id().asLongText());
+    
+        }
+    
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            cause.printStackTrace();
+            ctx.close();
+        }
+    }
+    ``` 
 
 
 ## 学习地址
