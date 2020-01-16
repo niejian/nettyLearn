@@ -26,6 +26,8 @@
             <!--例子:在代码中写入logger.info("info级别信息");-->
             <!--输出:12:8:34.501 [main] INFO  com.selton.Log4jTest - info级别信息-->
             <PatternLayout pattern="%d{H:m:s.S} [%t] %-5level %logger{36} - %msg%n"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+
         </Console>
 
 
