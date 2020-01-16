@@ -1,8 +1,7 @@
-package cn.com.netty.telnet;
+package cn.com.netty.official.snoop;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -10,13 +9,11 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * 实现一个telnet效果
- * @desc: cn.com.netty.telnet.TelnetServer
+ * @desc: cn.com.netty.official.HttpSoopServer
  * @author: niejian9001@163.com
- * @date: 2020/1/16 11:02
+ * @date: 2020/1/16 11:47
  */
-public class TelnetServer {
-
+public class HttpSnoopServer {
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -26,16 +23,17 @@ public class TelnetServer {
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new TelnetServerInitializer());
+                    .childHandler(new HttpSnoopServerInitializer());
 
-            Channel channel = serverBootstrap.bind(8899).sync().channel();
+            Channel channel = serverBootstrap.bind(8890).sync().channel();
             channel.closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
+        }finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+
 
     }
 }

@@ -1,4 +1,4 @@
-package cn.com.netty.telnet;
+package cn.com.netty.official.telnet;
 
 import cn.com.netty.common.CommonInstance;
 import io.netty.channel.ChannelInitializer;

@@ -1,4 +1,4 @@
-package cn.com.netty.telnet;
+package cn.com.netty.official.telnet;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
