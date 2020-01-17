@@ -284,6 +284,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 1. 定义一个接口的说明文件
 2. 通过编译器将这个文件编译成你想调用的那种语言文件
 3. 引入编译好的文件发起远程调用 
+### [protobuf说明文件](./protobuf.md)
 
 ## 目录说明
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)

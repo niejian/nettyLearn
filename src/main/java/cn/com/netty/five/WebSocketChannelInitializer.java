@@ -28,7 +28,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         pipeline.addLast(new HttpObjectAggregator(8192));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
         // 添加超时检查机制
-        pipeline.addLast("IdleStateHandler", new IdleStateHandler(5, 7, 10, TimeUnit.SECONDS));
+        pipeline.addLast("IdleStateHandler", new IdleStateHandler(5, 7, 10, TimeUnit.MINUTES));
         pipeline.addLast(new MyIdleChannelHandler());
         pipeline.addLast(new TextWebSocketServerHandler());
 
