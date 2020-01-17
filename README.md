@@ -282,7 +282,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
     ``` 
 
 ## 目录说明
-1. `official` package：netty官网运行的看起来比较好玩的示例
+1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)
 2. `以数字序号命名` 的package：B站学习示例
 
 ## 学习地址
