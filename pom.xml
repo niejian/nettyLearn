@@ -52,6 +52,17 @@
             <artifactId>log4j-api</artifactId>
             <version>2.11.2</version>
         </dependency>
+        <!--    protobuf 依赖    -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>3.11.0</version>
+        </dependency>
 
 
 
