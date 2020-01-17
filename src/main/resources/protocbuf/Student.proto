@@ -1,0 +1,15 @@
+syntax = "proto2";
+package student;
+
+// 加速
+option optimize_for = SPEED;
+option java_package = "cn.com.netty.proto";
+option java_outer_classname = "DataInfo";
+
+message Student{
+    required int32 id = 1;
+    required int32 age = 2;
+    required string name = 3;
+    optional string address = 4;
+}
+
