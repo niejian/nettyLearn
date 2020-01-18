@@ -78,7 +78,10 @@ message AddressBook {
     | extend | 扩展 | extend User {} |
     | package | 包 | |
     
-         
+#### 根据protoc文件生成java类
+```shell script
+protoc --java_out=./src/main/java ./src/main/resources/protocbuf/Student2.proto
+```         
  
 
     

@@ -63,6 +63,97 @@ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws E
 
 }
 ```
+## 代码大纲
+1. 基于netty得到`helloworld`程序；
+3. 群聊广播demo;
+4. 心跳检测demo;
+5. 基于netty的websocket实现;
+6. `protobuf`的应用
+    1. `protobuf`的简单使用和代码生成
+    2. `protobuf`接收多协议的处理方式<br/>
+        a. `proto`的文件声明<br/>
+        ```proto
+           //最外层传递的消息
+           message MyMessage {
+               enum DataType {
+                   StudentType = 1;
+                   DogType = 2;
+                   CatType = 3;
+               }
+           
+               required DataType date_type = 1;
+               // message中有多个可选字段，最多只有一个字段被设置，它是共享内存的。
+               // r如果设置了两个oneof，那么后面的oneof会覆盖前面设置的。
+               oneof dataBody {
+                   Student student = 2;
+                   Dog dog = 3;
+                   Cat cat = 4;
+               }
+           
+           }
+           
+           message Student{
+               required int32 id = 1;
+               required int32 age = 2;
+               required string name = 3;
+               optional string address = 4;
+           }
+           
+           message Dog {
+               optional string name = 1;
+               optional int32 age = 2;
+           }
+           
+           message Cat {
+               optional string name = 1;
+           }
+        ```
+       b. `Initializer`的处理<br/>
+        ```java
+           @Override
+           protected void initChannel(SocketChannel ch) throws Exception {
+               // 传入protobuf的编解码器。这样在handler端就能直接以对象的方式来传递
+               ChannelPipeline pipeline = ch.pipeline();
+               pipeline.addLast(new ProtobufVarint32FrameDecoder());
+               // 将对象转换为字节数组
+               pipeline.addLast(new ProtobufDecoder(MyDataInfo.MyMessage.getDefaultInstance()));
+               pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
+               pipeline.addLast(new ProtobufEncoder());
+               pipeline.addLast(new ProtobufServerHandler());
+       
+           }
+        ```
+       c. `Handler`的处理
+       ```java
+        public class ProtobufServerHandler extends SimpleChannelInboundHandler<MyDataInfo.MyMessage> {
+        
+            @Override
+            protected void channelRead0(ChannelHandlerContext ctx, MyDataInfo.MyMessage msg) throws Exception {
+                MyDataInfo.MyMessage.DataType dataType = msg.getDateType();
+        
+                if (dataType == MyDataInfo.MyMessage.DataType.StudentType) {
+        
+                    MyDataInfo.Student student = msg.getStudent();
+                    System.out.println("student....");
+                    System.out.println("name ： " + student.getName());
+                    System.out.println("id ： " + student.getId());
+                    System.out.println("address ： " + student.getAddress());
+                    System.out.println("age ： " + student.getAge());
+                } else if (dataType == MyDataInfo.MyMessage.DataType.DogType) {
+                    System.out.println("dog....");
+                    MyDataInfo.Dog dog = msg.getDog();
+                    System.out.println(dog.getName());
+                    System.out.println(dog.getAge());
+                } else {
+                    System.out.println("cat....");
+                    MyDataInfo.Cat cat = msg.getCat();
+                    System.out.println(cat.getName());
+                }
+        
+        
+            }
+        }
+       ```
 ## netty的执行流程
 1. 客户端连上netty服务器后，马上调用handlerAdded方法完成channel的添加操作(所谓channel可以理解为一个客户端)
 2. 添加操作执行完成以后立马调用channelRegistered方法将channel注入到netty中管理起来

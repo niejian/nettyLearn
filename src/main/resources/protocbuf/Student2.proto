@@ -1,0 +1,44 @@
+syntax = "proto2";
+package student;
+
+// 加速
+option optimize_for = SPEED;
+option java_package = "cn.com.netty.six";
+option java_outer_classname = "MyDataInfo";
+
+//最外层传递的消息
+message MyMessage {
+    enum DataType {
+        StudentType = 1;
+        DogType = 2;
+        CatType = 3;
+    }
+
+    required DataType date_type = 1;
+    // message中有多个可选字段，最多只有一个字段被设置，它是共享内存的。
+    // r如果设置了两个oneof，那么后面的oneof会覆盖前面设置的。
+    oneof dataBody {
+        Student student = 2;
+        Dog dog = 3;
+        Cat cat = 4;
+    }
+
+}
+
+message Student{
+    required int32 id = 1;
+    required int32 age = 2;
+    required string name = 3;
+    optional string address = 4;
+}
+
+message Dog {
+    optional string name = 1;
+    optional int32 age = 2;
+}
+
+message Cat {
+    optional string name = 1;
+}
+
+
