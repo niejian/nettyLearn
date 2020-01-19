@@ -377,6 +377,16 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 3. 引入编译好的文件发起远程调用 
 ### [protobuf说明文件](./protobuf.md)
 
+## thrift
+* 包名: `thrift`<br/>
+* thrift的声明文件<br/>
+    src/thrift<br/>
+* 生成java代码<br/>
+    ```shell script
+      thrift --gen java src/thrift/data.thrift
+    ```
+
+
 ## 目录说明
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)
 2. `以数字序号命名` 的package：B站学习示例
