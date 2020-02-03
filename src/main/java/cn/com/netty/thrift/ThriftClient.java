@@ -14,7 +14,17 @@ import org.apache.thrift.transport.TTransport;
  */
 public class ThriftClient {
     public static void main(String[] args) {
+        // 数据传输方式
+        /**
+         * 1. TSopcket 阻塞式传输方式
+         * 2. TFrameTransport:以frame为单位进行传输。非阻塞式服务中使用
+         * 3. TFileSocket
+         */
         TTransport tTransport = new TFramedTransport(new TSocket("localhost", 8899), 600);
+        // thrift的传输格式
+        // TBinaryProtocol 二进制的传输格式
+        // TCompactProtocol 压缩格式
+        // TJSONProtocol
         TProtocol tProtocol = new TCompactProtocol(tTransport);
         PersonService.Client client = new PersonService.Client(tProtocol);
 

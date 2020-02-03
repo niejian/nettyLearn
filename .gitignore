@@ -4,3 +4,9 @@ nettyLearn.iml
 .idea
 log
 *.log
+.classpath
+.factorypath
+.project
+.settings/
+gen-java/
+gen-py/

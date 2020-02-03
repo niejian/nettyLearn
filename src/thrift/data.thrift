@@ -1,4 +1,5 @@
 namespace java cn.com.netty.thrift.generate
+namespace py py.thrift.generate
 typedef i16 short
 typedef i32 int
 typedef i64 long
