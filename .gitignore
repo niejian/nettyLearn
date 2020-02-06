@@ -10,3 +10,4 @@ log
 .settings/
 gen-java/
 gen-py/
+*.txt

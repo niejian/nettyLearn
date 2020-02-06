@@ -1,4 +1,4 @@
-[toc]
+[TOC]
 # netty学习
 首先要明确的一点是： netty并未实现Servlet的相关接口。所以跟我们使用的tomcat的容器是不太一样的。<br/>
 简单的来说，netty的编程主要分为三个步骤：
@@ -108,7 +108,7 @@ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws E
                optional string name = 1;
            }
         ```
-       b. `Initializer`的处理<br/>
+          b. `Initializer`的处理<br/>
         ```java
            @Override
            protected void initChannel(SocketChannel ch) throws Exception {
@@ -120,10 +120,10 @@ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws E
                pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                pipeline.addLast(new ProtobufEncoder());
                pipeline.addLast(new ProtobufServerHandler());
-       
+          
            }
         ```
-       c. `Handler`的处理
+          c. `Handler`的处理
        ```java
         public class ProtobufServerHandler extends SimpleChannelInboundHandler<MyDataInfo.MyMessage> {
         
@@ -180,7 +180,7 @@ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws E
     ```java
     private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     ```
-   
+
 
 
 *  `Initilatizer` <br/>
@@ -370,7 +370,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
             ctx.close();
         }
     }
-    ``` 
+    ```
 ## RPC框架
 1. 定义一个接口的说明文件
 2. 通过编译器将这个文件编译成你想调用的那种语言文件
@@ -385,6 +385,30 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
     ```shell script
       thrift --gen java src/thrift/data.thrift
     ```
+## nio与io
+java.io中最为核心的概念是流（Stream），面向流的编程。
+
+> java中一个流要么是输入流，要么是输出流。不可能是既是输入流又是输出流。<br/>
+
+java.nio中有3个核心的概念，`Selector`, `Channel` , `Buffer`。面向块编程。
+
+* buffer本身就是一块内存，底层实现上，它实际上就是个数组。数据的 **读、写** 都是通过Buffer来实现的。`io中输入输出只能二者选其一`；
+* 除了数组之外，Buffer还提供了数据的结构化访问方式，并且可以追踪到系统的读写位置
+* Java中的8中数据类型都有各自对应的Buffer类型；char，byte，boolean、short、int、float、dubbo、long；
+* Channel指的是可以向其写入数据或是从中读取数据的对象，类似于io中stream。与stream不同的是，Channel是双向的，一个流只可能是InputStream、OutPutStream。channel打开后则可以进行数据读、写、读写；由于channel是双向的，因此能更好的反映出底层操作系统的工作情况；在Linux系统中，它的通道是双向的；
+* 所有数据的读写都是通过Buffer来进行的，<font color=red>**永远不会出现直接向Channel中写入数据，或是直接从Channel中读取数据；**</font>
+
+
+
+### java中io重要的设计模式
+
+装饰模式
+
+### nio的工作模式
+
+![](https://s2.ax1x.com/2020/02/06/1yQ7IP.md.png)
+
+
 
 
 ## 目录说明
