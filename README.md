@@ -408,7 +408,33 @@ java.nio中有3个核心的概念，`Selector`, `Channel` , `Buffer`。面向块
 
 ![](https://s2.ax1x.com/2020/02/06/1yQ7IP.md.png)
 
+### NIO Buffer
 
+Buffer的底层是由java数组组成的；NIO Buffer中的三个重要状态属性含义
+
+#### position
+
+> 读、写操作时指向的数组下标，随着读、写操作而改变。可以理解成操作JAVA中的数组下标信息；
+
+#### limit
+
+> buffer中第一个不能读取的数组下标索引；
+
+limit的变化情况有以下几种情况：
+
+1. Buffer初始化的时候，此时limit = capacity；
+2. 当buffer发生读或写的时候（调用flip()）,此时limit = position；
+
+#### capacity
+
+> buffer包含的元素数量，这个值大于0并且永远不会被改变。
+
+#### flip()方法
+
+flip()方法的智行过程过程；
+
+1. 将limit设置成position；
+2. 将position归0，即从头开始读写；
 
 
 ## 目录说明
