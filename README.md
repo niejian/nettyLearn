@@ -436,6 +436,22 @@ flip()方法的智行过程过程；
 1. 将limit设置成position；
 2. 将position归0，即从头开始读写；
 
+#### nio的零拷贝
+
+* java 堆内存声明；
+```java
+ ByteBuffer buffer = ByteBuffer.allocate(capacity);
+```
+* java直接内存声明；
+```java
+ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
+```
+两者之间的区别是：<br/>
+1. `ByteBuffer.allocate(capacity)`声明的java对内存，当程序工作的时候，需要将此内存拷贝到堆外内存中再和IO设备交互；
+2. `ByteBuffer.allocateDirect(capacity)` 直接声明java堆外的内存，**不需要再次拷贝而直接与IO设备交互**，减少一次拷贝的过程；
+
+
+
 
 ## 目录说明
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)

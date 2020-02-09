@@ -1,20 +1,17 @@
 package cn.com.netty.nio;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * nio方式的文件读写
- * @desc: cn.com.netty.nio.NioTest4
+ * @desc: cn.com.netty.nio.NioTest8
  * @author: niejian9001@163.com
- * @date: 2020/2/6 15:47
+ * @date: 2020/2/7 20:34
  */
-public class NioTest4 {
-
+public class NioTest8 {
     public static void main(String[] args) throws IOException {
         FileInputStream inputStream = new FileInputStream("input.txt");
         FileOutputStream outputStream = new FileOutputStream("output.txt");
@@ -23,13 +20,14 @@ public class NioTest4 {
         FileChannel outputStreamChannel = outputStream.getChannel();
 
         int capacity = 512;
-
-        ByteBuffer buffer = ByteBuffer.allocate(capacity);
+        //直接内存声明
+        // 在java堆外声明一段内存空间，直接与IO设备进行交互（零拷贝）
+        ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
 
         int index = 1;
         while (true) {
             //重新将buffer中的position指向0
-             buffer.clear();
+            buffer.clear();
 
             // 从输入流中将数据写入到buffer
             int read = inputStreamChannel.read(buffer);
@@ -53,4 +51,5 @@ public class NioTest4 {
         inputStreamChannel.close();
         outputStreamChannel.close();
     }
+
 }
