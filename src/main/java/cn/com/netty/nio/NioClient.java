@@ -53,6 +53,7 @@ public class NioClient {
                                     InputStreamReader input = new InputStreamReader(System.in);
                                     BufferedReader br = new BufferedReader(input);
                                     String sendMessage = br.readLine();
+                                    // 客户端向服务端写入数据
                                     byteBuffer.put(sendMessage.getBytes());
                                     byteBuffer.flip();
                                     client.write(byteBuffer);
@@ -60,10 +61,22 @@ public class NioClient {
                             });
                         }
 
+                        // 注册读取事件，获得服务端的返回数据
+                        client.register(selector, SelectionKey.OP_READ);
+
+                    } else if (selectionKey.isReadable()) {
+                        SocketChannel client = (SocketChannel) selectionKey.channel();
+                        ByteBuffer readBuffer = ByteBuffer.allocate(512);
+                        int count = client.read(readBuffer);
+                        if (count > 0) {
+                            String receiveMessage = new String(readBuffer.array());
+                            System.out.println("【客户端】接收到服务端返回的数据 ： " + receiveMessage);
+                        }
                     }
                 }
-            }
 
+                selectionKeys.clear();
+            }
 
 
         } catch (Exception e) {

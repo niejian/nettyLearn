@@ -29,7 +29,7 @@ public class NioTest12 {
 
         for (int i = 0; i < ports.length; i++) {
             ServerSocketChannel socketChannel = ServerSocketChannel.open();
-            // 绑定到特定的地址上面
+            // 将serverscoket设置成非阻塞的
             socketChannel.configureBlocking(false);
             ServerSocket serverSocket = socketChannel.socket();
             InetSocketAddress address = new InetSocketAddress(ports[i]);
@@ -55,6 +55,7 @@ public class NioTest12 {
 
                     SocketChannel socketChannel = serverSocketChannel.accept();
                     socketChannel.configureBlocking(false);
+                    // 注册读取事件，为下一阶段获取读取数据做准备
                     socketChannel.register(selector, SelectionKey.OP_READ);
 
                     iterator.remove();
