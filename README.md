@@ -450,7 +450,43 @@ ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
 1. `ByteBuffer.allocate(capacity)`声明的java对内存，当程序工作的时候，需要将此内存拷贝到堆外内存中再和IO设备交互；
 2. `ByteBuffer.allocateDirect(capacity)` 直接声明java堆外的内存，**不需要再次拷贝而直接与IO设备交互**，减少一次拷贝的过程；
 
+#### 代码解析
 
+```java
+ServerSocketChannel socketChannel = ServerSocketChannel.open();
+// 将serverscoket设置成非阻塞的
+socketChannel.configureBlocking(false);
+ServerSocket serverSocket = socketChannel.socket();
+InetSocketAddress address = new InetSocketAddress(ports[i]);
+// 端口绑定
+serverSocket.bind(address);
+// 注册至selector
+// 当客户端向服务端发起一个链接的时候，服务端会获取到这个链接
+socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+```
+
+### NIO 的零拷贝相关概念
+
+#### 什么是领拷贝
+
+零拷贝描述的是CPU不用执行拷贝数据从一个存储区域到另一个存储区域的任务，这通常用于桐木关通过网络传输一个文件时以减少cpu周期（减少上下文切换）和内存带块。
+
+#### 如何避免数据拷贝
+
+1. 避免操作系统内核缓冲区之间进行数据拷贝操作。
+2. 避免操作系统和用户应用程序地址空间这两者之间进行数据拷贝。
+3. 用户空间可以避开操作系统直接访问硬件存储。
+
+#### 零拷贝带来的好处
+
+1. 减少甚至完全避免不必要的CPU拷贝，从而让cpu解脱出来去执行其他的任务
+2. 减少内存使用
+3. 减少上下文切换
+4. 零拷贝完全依赖于操作系统
+
+#### 示意图
+
+![](https://s2.ax1x.com/2020/02/12/1Hun9U.md.png)
 
 
 ## 目录说明
