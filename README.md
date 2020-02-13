@@ -385,111 +385,15 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
     ```shell script
       thrift --gen java src/thrift/data.thrift
     ```
-## nio与io
-java.io中最为核心的概念是流（Stream），面向流的编程。
 
-> java中一个流要么是输入流，要么是输出流。不可能是既是输入流又是输出流。<br/>
+## ***nio 相关知识***
 
-java.nio中有3个核心的概念，`Selector`, `Channel` , `Buffer`。面向块编程。
+[***nio相关***](./nio.md)
 
-* buffer本身就是一块内存，底层实现上，它实际上就是个数组。数据的 **读、写** 都是通过Buffer来实现的。`io中输入输出只能二者选其一`；
-* 除了数组之外，Buffer还提供了数据的结构化访问方式，并且可以追踪到系统的读写位置
-* Java中的8中数据类型都有各自对应的Buffer类型；char，byte，boolean、short、int、float、dubbo、long；
-* Channel指的是可以向其写入数据或是从中读取数据的对象，类似于io中stream。与stream不同的是，Channel是双向的，一个流只可能是InputStream、OutPutStream。channel打开后则可以进行数据读、写、读写；由于channel是双向的，因此能更好的反映出底层操作系统的工作情况；在Linux系统中，它的通道是双向的；
-* 所有数据的读写都是通过Buffer来进行的，<font color=red>**永远不会出现直接向Channel中写入数据，或是直接从Channel中读取数据；**</font>
-
-
-
-### java中io重要的设计模式
-
-装饰模式
-
-### nio的工作模式
-
-![](https://s2.ax1x.com/2020/02/06/1yQ7IP.md.png)
-
-### NIO Buffer
-
-Buffer的底层是由java数组组成的；NIO Buffer中的三个重要状态属性含义
-
-#### position
-
-> 读、写操作时指向的数组下标，随着读、写操作而改变。可以理解成操作JAVA中的数组下标信息；
-
-#### limit
-
-> buffer中第一个不能读取的数组下标索引；
-
-limit的变化情况有以下几种情况：
-
-1. Buffer初始化的时候，此时limit = capacity；
-2. 当buffer发生读或写的时候（调用flip()）,此时limit = position；
-
-#### capacity
-
-> buffer包含的元素数量，这个值大于0并且永远不会被改变。
-
-#### flip()方法
-
-flip()方法的智行过程过程；
-
-1. 将limit设置成position；
-2. 将position归0，即从头开始读写；
-
-#### nio的零拷贝
-
-* java 堆内存声明；
-```java
- ByteBuffer buffer = ByteBuffer.allocate(capacity);
-```
-* java直接内存声明；
-```java
-ByteBuffer buffer = ByteBuffer.allocateDirect(capacity);
-```
-两者之间的区别是：<br/>
-1. `ByteBuffer.allocate(capacity)`声明的java对内存，当程序工作的时候，需要将此内存拷贝到堆外内存中再和IO设备交互；
-2. `ByteBuffer.allocateDirect(capacity)` 直接声明java堆外的内存，**不需要再次拷贝而直接与IO设备交互**，减少一次拷贝的过程；
-
-#### 代码解析
-
-```java
-ServerSocketChannel socketChannel = ServerSocketChannel.open();
-// 将serverscoket设置成非阻塞的
-socketChannel.configureBlocking(false);
-ServerSocket serverSocket = socketChannel.socket();
-InetSocketAddress address = new InetSocketAddress(ports[i]);
-// 端口绑定
-serverSocket.bind(address);
-// 注册至selector
-// 当客户端向服务端发起一个链接的时候，服务端会获取到这个链接
-socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-```
-
-### NIO 的零拷贝相关概念
-
-#### 什么是领拷贝
-
-零拷贝描述的是CPU不用执行拷贝数据从一个存储区域到另一个存储区域的任务，这通常用于桐木关通过网络传输一个文件时以减少cpu周期（减少上下文切换）和内存带块。
-
-#### 如何避免数据拷贝
-
-1. 避免操作系统内核缓冲区之间进行数据拷贝操作。
-2. 避免操作系统和用户应用程序地址空间这两者之间进行数据拷贝。
-3. 用户空间可以避开操作系统直接访问硬件存储。
-
-#### 零拷贝带来的好处
-
-1. 减少甚至完全避免不必要的CPU拷贝，从而让cpu解脱出来去执行其他的任务
-2. 减少内存使用
-3. 减少上下文切换
-4. 零拷贝完全依赖于操作系统
-
-#### 示意图
-
-![](https://s2.ax1x.com/2020/02/12/1Hun9U.md.png)
 
 
 ## 目录说明
+
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)
 2. `以数字序号命名` 的package：B站学习示例
 
