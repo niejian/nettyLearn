@@ -16,7 +16,97 @@ java.nio中有3个核心的概念，`Selector`, `Channel` , `Buffer`。面向块
 
 ### java中io重要的设计模式
 
-装饰模式
+#### 装饰模式
+
+##### 说明
+
+假设有一个接口Human，一个接口的实现类Man。人类Human是可以跑步的，但是不能飞。
+
+    如果想给人类加上飞翔的翅膀，可以有三种解决方案：
+
+1. 修改实现类Man的方法，但不符合开闭原则
+2. 给实现类Man添加一个子类，扩展一个人类可以飞的功能。问题在于，如果又想给人类增加猎豹般奔跑的速度，需要继续扩展一个子类。显然，使用继承的方式去扩展一个类的功能，会增加类的层级，类的臃肿会加大维护的成本。
+3. 使用装饰模式扩展一个类的功能。好处在于，如果继承关系是纵向的，那么装饰类则是某个类横向的扩展，并不会影响继承链上的其他类。例如：C extends B , B extends A，如果需要扩展B的功能，可以设计一个B的装饰类，它并不会影响B的子类C。如果采用在B里面增加方法，势必会使B的所有子类结构被改变。
+
+
+
+##### uml
+
+![](https://s2.ax1x.com/2020/02/15/1vOKtH.md.jpg)
+
+##### demo
+
+- 定义一个接口Human
+- 定义一个被装饰的类Man
+- 定义一个装饰的抽象类，**内部持有被装饰类的引用**
+- 定义一个装饰的实现类，里面添加需要增强的功能方法
+
+```java
+// 装饰类，需要
+public abstract class AbstractDecorateHuman implements Human {
+    /***
+     * 有一个对接口类的引用
+     */
+    private Human human;
+
+    AbstractDecorateHuman(Human human) {
+        this.human = human;
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String run() {
+        return human.run();
+    }
+}
+```
+
+```java
+// 装饰类继承抽象类并添加增强方法
+public class DecorateHuman extends AbstractDecorateHuman {
+
+    public DecorateHuman(Human human) {
+        super(human);
+    }
+
+    /**
+     * 对装饰类添加的增强的方法
+     */
+    public void fly() {
+        System.out.println("增强的fly功能");
+
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public String run() {
+        fly();
+        return super.run();
+    }
+}
+```
+
+
+
+##### 使用场景及优缺点
+
+* 使用场景
+  * 替代继承，扩展一个类的功能；
+  * 动态给对象添加功能、撤销功能；
+* 优点
+  * 动态扩展一个实现类的功能，在不需要添加功能的时候，可以撤销装饰；
+  * 装饰类和被装饰类模块间，通过抽象产生依赖，不会相互耦合；
+  * 装饰模式替换继承，可以避免继承链的子类被影响；
+
+#### 装饰模式与代理模式的区别
+
+装饰模式：侧重给一个实现类添加动态功能，不回对类的方法进行过滤拦截；
+
+代理模式：侧重将一个实现类的功能委托给代理类处理。可以对实现类的方法进行过滤拦截（某种情况下，可能不执行实现类的方法）
 
 ### nio的工作模式
 
