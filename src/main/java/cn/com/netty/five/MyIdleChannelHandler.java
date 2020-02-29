@@ -4,6 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.util.concurrent.Executors;
+
 /**
  * 空闲通道检测
  * @author niejian
@@ -14,6 +16,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 public class MyIdleChannelHandler  extends ChannelInboundHandlerAdapter {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+
 
         // 如果是空闲事件
         if (evt instanceof IdleStateEvent) {
