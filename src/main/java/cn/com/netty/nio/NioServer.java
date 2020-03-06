@@ -40,6 +40,7 @@ public class NioServer {
                 // 返回selector所关注(OP_ACCEPT)的事件数量
                 // register(selector, SelectionKey.OP_ACCEPT);
                 selector.select();
+                // 通过selector获取到连接集合
                 Set<SelectionKey> selectionKeys = selector.selectedKeys();
 
                 // 注册读取事件

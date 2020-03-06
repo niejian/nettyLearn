@@ -390,6 +390,12 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 
 [***nio相关***](./nio.md)
 
+## Netty 的工作模式
+
+### Reactor模式
+
+###**[Reactor模式介绍](./reactor-desc.md)** 
+
 
 
 ## 目录说明

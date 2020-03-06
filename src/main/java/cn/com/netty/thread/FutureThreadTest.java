@@ -49,7 +49,6 @@ public class FutureThreadTest {
             futureTasks.add(futureTask);
             executorService.submit(futureTask);
 
-
         }
 
         for (int i = 0; i < futureTasks.size(); i++) {
