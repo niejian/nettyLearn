@@ -1,23 +1,24 @@
-package cn.com.netty.five;
+package cn.com.netty.heartbeat;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
-import java.util.concurrent.Executors;
-
 /**
- * 空闲通道检测
  * @author niejian
  * @description
- * @file cn.com.netty.five.MyIdleChannelHandler
- * @create 2020-01-15 21:52
+ * @file cn.com.netty.four.MyServerHandler
+ * @create 2020-01-14 22:17
  **/
-public class MyIdleChannelHandler  extends ChannelInboundHandlerAdapter {
+public class MyServerHandler extends ChannelInboundHandlerAdapter {
+    /**
+     * 触发事件
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-
-
         // 如果是空闲事件
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
@@ -35,7 +36,6 @@ public class MyIdleChannelHandler  extends ChannelInboundHandlerAdapter {
             }
 
             System.out.println(ctx.channel().remoteAddress() + " 超时事件： " + eventType);
-
             ctx.channel().close();
         }
     }

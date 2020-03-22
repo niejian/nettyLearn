@@ -1,4 +1,4 @@
-package cn.com.netty.firstclass;
+package cn.com.netty.helloworld;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

@@ -1,4 +1,4 @@
-package cn.com.netty.third;
+package cn.com.netty.chat;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -12,17 +12,17 @@ import io.netty.util.CharsetUtil;
 /**
  * @author niejian
  * @description
- * @file cn.com.netty.third.MyClientChannelInitializor
- * @create 2020-01-14 21:45
+ * @file cn.com.netty.third.MyChatServerInitializeor
+ * @create 2020-01-14 20:27
  **/
-public class MyClientChannelInitializor extends ChannelInitializer<SocketChannel> {
+public class MyChatServerInitializeor extends ChannelInitializer<SocketChannel> {
     @Override
-    protected void initChannel(SocketChannel ch) throws Exception {
-        ChannelPipeline pipeline = ch.pipeline();
+    protected void initChannel(SocketChannel socketChannel) throws Exception {
+        ChannelPipeline pipeline = socketChannel.pipeline();
         pipeline.addLast("DelimiterBasedFrameDecoder", new DelimiterBasedFrameDecoder(4096, Delimiters.lineDelimiter()));
         pipeline.addLast("StringDecoder", new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast("StringEncoder", new StringEncoder(CharsetUtil.UTF_8));
-        pipeline.addLast(new MyChatClientChannelHandler());
+        pipeline.addLast(new MyServerChannelHandler());
 
     }
 }

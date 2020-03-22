@@ -1,4 +1,4 @@
-package cn.com.netty.four;
+package cn.com.netty.protobuf;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,13 +9,11 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * 心跳检测
- * @author niejian
- * @description
- * @file cn.com.netty.four.MyServer
- * @create 2020-01-14 22:12
- **/
-public class MyHeartBeatServer {
+ * protocbuf与netty的结合使用示例
+ * @user niejian9001@163.com
+ * @date 2020/1/18 17:08
+ */
+public class ProtobufServer {
 
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -26,7 +24,7 @@ public class MyHeartBeatServer {
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new MyServerInitializor());
+                    .childHandler(new ProtobufServerInitializer());
 
             ChannelFuture channelFuture = serverBootstrap.bind(8899).sync();
             channelFuture.channel().closeFuture().sync();

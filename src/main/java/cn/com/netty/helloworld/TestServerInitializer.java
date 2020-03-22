@@ -1,4 +1,4 @@
-package cn.com.netty.firstclass;
+package cn.com.netty.helloworld;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

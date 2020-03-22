@@ -1,4 +1,4 @@
-package cn.com.netty.six;
+package cn.com.netty.websocket;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,12 +9,14 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 /**
- * protocbuf与netty的结合使用示例
- * @user niejian9001@163.com
- * @date 2020/1/18 17:08
- */
-public class ProtobufServer {
-
+ * webscoker
+ *
+ * @author niejian
+ * @description
+ * @file cn.com.netty.five.MyServer
+ * @create 2020-01-15 19:55
+ **/
+public class MyWebSocketServer {
     public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -24,7 +26,7 @@ public class ProtobufServer {
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ProtobufServerInitializer());
+                    .childHandler(new WebSocketChannelInitializer());
 
             ChannelFuture channelFuture = serverBootstrap.bind(8899).sync();
             channelFuture.channel().closeFuture().sync();

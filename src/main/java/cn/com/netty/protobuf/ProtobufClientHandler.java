@@ -1,4 +1,4 @@
-package cn.com.netty.six;
+package cn.com.netty.protobuf;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

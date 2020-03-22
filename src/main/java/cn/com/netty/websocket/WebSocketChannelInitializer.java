@@ -1,4 +1,4 @@
-package cn.com.netty.five;
+package cn.com.netty.websocket;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

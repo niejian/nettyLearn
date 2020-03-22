@@ -1,4 +1,4 @@
-package cn.com.netty.third;
+package cn.com.netty.chat;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

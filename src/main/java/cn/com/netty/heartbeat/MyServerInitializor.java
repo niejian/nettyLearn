@@ -1,4 +1,4 @@
-package cn.com.netty.four;
+package cn.com.netty.heartbeat;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

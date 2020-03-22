@@ -1,4 +1,4 @@
-package cn.com.netty.six;
+package cn.com.netty.protobuf;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
