@@ -65,10 +65,10 @@ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws E
 ```
 ## 代码大纲
 1. 基于netty得到`helloworld`程序；
-3. 群聊广播demo;
-4. 心跳检测demo;
-5. 基于netty的websocket实现;
-6. `protobuf`的应用
+2. 群聊广播demo;
+3. 心跳检测demo;
+4. 基于netty的websocket实现;
+5. `protobuf`的应用
     1. `protobuf`的简单使用和代码生成
     2. `protobuf`接收多协议的处理方式<br/>
         a. `proto`的文件声明<br/>
@@ -272,7 +272,7 @@ public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 ## 心跳检查程序
 * server端还是老样子。
 * `initializer`的写法<br/>
-服务端超过5S未读取到信息或者超过7秒未写，或者超过10秒既没有读也没有写，那么就心跳检测失败。<br/>
+  服务端超过5S未读取到信息或者超过7秒未写，或者超过10秒既没有读也没有写，那么就心跳检测失败。<br/>
 ```java
  @Override
 protected void initChannel(SocketChannel ch) throws Exception {
@@ -284,7 +284,7 @@ protected void initChannel(SocketChannel ch) throws Exception {
 }
 ```
 * `channelHandler`<br/>
-这里的channelHandler就不再是继承`SimpleChannelInBoundHandler`了，而是专门继承另一个；<br/>
+  这里的channelHandler就不再是继承`SimpleChannelInBoundHandler`了，而是专门继承另一个；<br/>
 
 ```java
 public class MyServerHandler extends ChannelInboundHandlerAdapter {
@@ -342,7 +342,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 }
 ```
 * `ChannelHandler`<br/>
-我这里有两个handler，分别是上一节讲述的心跳检测的handler和处理文本信息的websocket
+  我这里有两个handler，分别是上一节讲述的心跳检测的handler和处理文本信息的websocket
     * TextWebSocketServerHandler （文本信息的websocket处理）
     ```java
     public class TextWebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
@@ -395,8 +395,22 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 ### Reactor模式
 
 ###**[Reactor模式介绍](./reactor-desc.md)** 
+### `EventLoop`的相关知识点
+1. 一个`EventLoopGroup`当中包含一个或者多个`EventLoop`；
+2. 一个`EventLoop`在它的整个生命周期当中只与唯一的Thread进行绑定；
+3. 所有的`EventLoop`所处理的各种I/O事件都将在它所关联的Thread上面进行处理；
+4. **一个`Channel`在它的生命周期只会注册在一个`EventLoop`上**；
+5. 一个`EventLoop`会被一个或者多个`Channel`所绑定；
 
+由以上观点可以看出，在Netty中，Channel的实现一定是线程安全的；基于此，我们可以存储一个Channel的引用，并且需要向远程端点发送数据时，通过引用
+也能调用channel的相关方法，即便当时有很多线程在使用它也不会出现多线程的问题；而且**消息一定会按照顺序发送出去**
 
+重要结论：我们在业务开发中，不需要将长时间的耗时任务放到`EventLoop`的执行队列中，因为它将会一直阻塞该线程所绑定的的所有Channel的其他执行任务；
+如果要进行阻塞调用或者耗时操作，那么我们将要使用一个专门的`EventExecutor`（业务线程池）。<br/>
+
+实现`EventExecutor`有以下两种方式.
+1. 使用JDK提供的线程池操作；
+2. 使用Netty提供的向ChannelPipeline`addLast(EventExecutorGroup group, ChannelHandler... handlers);`，这样所有的任务就全部丢给所有的这个group线程组执行；
 
 ## 目录说明
 
