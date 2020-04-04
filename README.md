@@ -411,7 +411,36 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 实现`EventExecutor`有以下两种方式.
 1. 使用JDK提供的线程池操作；
 2. 使用Netty提供的向ChannelPipeline`addLast(EventExecutorGroup group, ChannelHandler... handlers);`，这样所有的任务就全部丢给所有的这个group线程组执行；
+### ByteBuf
+#### 创建ByteBuf
+```java
+CompositeByteBuf compositeByteBuf = Unpooled.compositeBuffer();
+ByteBuf heapBuff = Unpooled.buffer(10);
+ByteBuf directBuffer = Unpooled.directBuffer(8);
+```
+#### 特性
+Netty的ByteBuf提供了三种缓冲区类型
+1. heap buffer
+这是常用的类型，ButeBuf将数据存储到JVM中，并且将实际的数据存放到byte array中实现。
 
+优点：由于数据是存储在JVM中，因此可以快速的创建和快速释放，并且它提供了直接访问内部字节数组的方法。<br/>
+缺点： 每次读写数据时，都需要先将数据复制到直接缓冲区中再进行网络传输
+
+2. direct buffer
+在堆之外直接分配内存空间，直接缓冲区并不会占用堆的容量空间，因为它是由操作系统在本地进行的数据分配。
+
+优点： 在使用socket网络传输时，可以直接将操作本地内存的数据，不需要从JVM将数据复制到直接缓冲区。<br/>
+缺点： 因为direct buffer是直接在本地内存的，所有在分配和释放比堆空间更加复杂，而且速度更慢些。<br/>
+
+Netty通过内存池来解决这个问题，直接缓冲区并不支持通过字节数组方式访问数据。
+**对于后端业务消息的编码来说，推荐使用Heap buffer；对于I/O通信线程来说，推荐使用 Driect buffer**
+3. composite buff(组合缓冲区)
+
+
+#### JDK ByteBuffer与ByteBuf的区别
+1. Netty的ByteBuf采用了读写索引分离的策略（readIndex/writeIndex），一个初始化（里面尚无数据）的ByteBuf的readIndex和writeInde都是0；
+2. 当读索引与写索引处在同一个位置时，如果继续读取，那么将会抛出IndexOutBoundsException
+3. 对于ByteBuf的任何读写操作都会分别单独维护读索引和写索引，maxCapacity最大容量默认的是Integer.MAX_VALUE
 ## 目录说明
 
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)
