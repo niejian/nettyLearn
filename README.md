@@ -441,6 +441,88 @@ Netty通过内存池来解决这个问题，直接缓冲区并不支持通过字
 1. Netty的ByteBuf采用了读写索引分离的策略（readIndex/writeIndex），一个初始化（里面尚无数据）的ByteBuf的readIndex和writeInde都是0；
 2. 当读索引与写索引处在同一个位置时，如果继续读取，那么将会抛出IndexOutBoundsException
 3. 对于ByteBuf的任何读写操作都会分别单独维护读索引和写索引，maxCapacity最大容量默认的是Integer.MAX_VALUE
+#### JDK ByteBuffer的缺点
+1. `final byte[] hb`；这时JDK ByteBuffer对象中用于存储疏忽的对象声明，可以看出，其字节数组被声明`final`，也就是长度是固定不变的，一旦分配好后不能动态扩容和收缩；二期当待存储的数据字节很大的时候容易出现异常。如果要防止这个异常那就需要在存储之前完全确定好字节数组长度。如果ByteBuffer的空间不足，我们只有一种解决方案：创建一个新的ByteBuffer对象，然后将之前的字节数组中的数据赋值过去，不过这一切需要开发者自己去手动完成
+2. ByteBuffer只能使用一个position至真来标识位置信息，在进行数据读写切换时就需要调用`flip()`或是`rewind()置0`
+
+#### Netty中ByteBuf的优点
+
+1. 存储字节的数组是动态的，最大值是Integer.MAX_VALUE，这里的动态性提现在write方法中。write方法在执行是会判读buffer容量，如果不足就自动扩容；
+
+   ````java
+   final void ensureWritable0(int minWritableBytes) {
+     			// 获取到当前ByteBuf的writeIndex
+           final int writerIndex = writerIndex();
+     			// 
+           final int targetCapacity = writerIndex + minWritableBytes;
+     			// 当前数组容量是否足够
+           if (targetCapacity <= capacity()) {
+               ensureAccessible();
+               return;
+           }
+           if (checkBounds && targetCapacity > maxCapacity) {
+               ensureAccessible();
+               throw new IndexOutOfBoundsException(String.format(
+                       "writerIndex(%d) + minWritableBytes(%d) exceeds maxCapacity(%d): %s",
+                       writerIndex, minWritableBytes, maxCapacity, this));
+           }
+   
+           // Normalize the target capacity to the power of 2.
+           final int fastWritable = maxFastWritableBytes();
+           int newCapacity = fastWritable >= minWritableBytes ? writerIndex + fastWritable
+                   : alloc().calculateNewCapacity(targetCapacity, maxCapacity);
+   
+           // Adjust to the new capacity.
+           capacity(newCapacity);
+       }
+   ````
+
+2. ByteBuf的读写索引事分开的，使用起来很方便；
+#### ByteBuf判断是否可用
+引用计数，referencecount，通过调用`release()、retain()`对bytebuf对象计数做减、加操作。如果bytebuf的引用计数变为0，那么表示这个对象将要被回收。`retain()`
+```java
+ // rawIncrement == increment << 1
+private T retain0(T instance, final int increment, final int rawIncrement) {
+    int oldRef = updater().getAndAdd(instance, rawIncrement);
+    if (oldRef != 2 && oldRef != 4 && (oldRef & 1) != 0) {
+        throw new IllegalReferenceCountException(0, increment);
+    }
+    // don't pass 0!
+    if ((oldRef <= 0 && oldRef + rawIncrement >= 0)
+            || (oldRef >= 0 && oldRef + rawIncrement < oldRef)) {
+        // overflow case
+        // CAS 操作
+        updater().getAndAdd(instance, -rawIncrement);
+        throw new IllegalReferenceCountException(realRefCnt(oldRef), increment);
+    }
+    return instance;
+}
+
+public int getAndAdd(T obj, int delta) {
+        int prev, next;
+        // 死循环，知道CAS操作成功为止
+        do {
+            prev = get(obj);
+            next = prev + delta;
+        } while (!compareAndSet(obj, prev, next));
+        return prev;
+    }
+```
+##### AtomicIntegerFieldUpdater 要点总结
+1. 更新器只能更新int类型的变量，不能包含其他类型
+    ```java
+     if (field.getType() != int.class)
+                    throw new IllegalArgumentException("Must be integer type");
+             
+    ```
+2. 更新的字段必须要有`volatile`修饰
+    ```java
+     if (!Modifier.isVolatile(modifiers))
+        throw new IllegalArgumentException("Must be volatile type");
+    ```
+3. 待更新的变量不能是static（底层使用`unSafa.objectFieldOffet`来操作，CAS操作本质是根据对象实例的偏移量进行赋值的）
+4. 只能更新他可见范围内的变量（底层通过反射来实现）
+
 ## 目录说明
 
 1. `official` package：[netty官网运行的看起来比较好玩的示例](https://netty.io/wiki/index.html)
